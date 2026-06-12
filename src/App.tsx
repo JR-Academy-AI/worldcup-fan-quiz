@@ -37,26 +37,46 @@ function Home({ onStart }: { onStart: () => void }) {
   return (
     <div className="screen home">
       <div className="pitch-deco" aria-hidden />
-      <div className="home-ball">⚽</div>
-      <p className="home-kicker">2026 世界杯特别企划</p>
-      <h1 className="home-title">
-        球迷<span className="gold-text">含金量</span>检测
-      </h1>
-      <p className="home-sub">
-        15 张球星脸，测出你看的是球，还是热闹。
-        <br />
-        看球二十年？先过了这关再说。
-      </p>
-      <div className="tier-teaser">
-        <span>🥉 纯黄铜</span>
-        <span>🍺 电镀金</span>
-        <span>💍 24K</span>
-        <span>👑 球王</span>
+      <div className="home-panel">
+        <div className="home-topline">
+          <span>2026 世界杯特别企划</span>
+          <b>2 分钟</b>
+        </div>
+        <div className="home-ball">⚽</div>
+        <p className="home-kicker">World Cup Fan Check</p>
+        <h1 className="home-title">
+          球迷<span className="gold-text">含金量</span>检测
+        </h1>
+        <p className="home-sub">
+          15 张球星脸，测出你看的是球，还是热闹。
+          <br />
+          看球二十年？先过了这关再说。
+        </p>
+        <div className="tier-teaser">
+          <span>🥉 纯黄铜</span>
+          <span>🍺 电镀金</span>
+          <span>💍 24K</span>
+          <span>👑 球王</span>
+        </div>
+        <button className="btn-primary btn-big" onClick={onStart}>
+          开始检测 →
+        </button>
+        <div className="home-stats" aria-label="测试说明">
+          <span>
+            <b>38</b>
+            支球队
+          </span>
+          <span>
+            <b>256</b>
+            名球员
+          </span>
+          <span>
+            <b>15</b>
+            题随机
+          </span>
+        </div>
       </div>
-      <button className="btn-primary btn-big" onClick={onStart}>
-        开始检测 →
-      </button>
-      <p className="home-hint">本届 38 队 256 名在册球员随机出题 · 全程 2 分钟</p>
+      <p className="home-hint">每次出题都不同 · 答错会被无情吐槽</p>
       <p className="home-brand">
         <img src="./brand/jr-box.svg" alt="匠人学院" className="home-brand-box" />
         <img src="./brand/tagline-xueai-laijiangren.png" alt="学 AI 来匠人" className="home-brand-tagline" />
@@ -113,13 +133,15 @@ function Quiz({ quiz, onDone }: { quiz: Question[]; onDone: (ans: Answered[]) =>
         </div>
         <span className="q-total">/{quiz.length}</span>
       </div>
-      <div className="photo-frame" key={q.player.id}>
-        <div className="photo-card">
-          <img src={q.player.image} alt="这位球星是谁？" draggable={false} />
+      <div className="quiz-card">
+        <div className="photo-frame" key={q.player.id}>
+          <div className="photo-card">
+            <img src={q.player.image} alt="这位球星是谁？" draggable={false} />
+          </div>
+          <span className="photo-tag">⚽ 2026 世界杯在册球员</span>
         </div>
-        <span className="photo-tag">⚽ 2026 世界杯在册球员</span>
+        <h2 className="q-title">这位是谁？</h2>
       </div>
-      <h2 className="q-title">这位是谁？</h2>
       <div className="options">
         {q.options.map((opt, i) => {
           let cls = 'option';
@@ -178,6 +200,7 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   return (
     <div className="screen result">
       <div className="hero-card">
+        <p className="result-kicker">检测结果</p>
         <div className="medal-ring">
           <span>{tier.emoji}</span>
         </div>
