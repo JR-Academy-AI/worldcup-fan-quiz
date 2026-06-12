@@ -57,7 +57,17 @@ export async function makePoster(gold: number, tier: Tier, beaten: number): Prom
   // 挑衅 CTA
   ctx.fillStyle = '#B42318';
   ctx.font = '600 30px -apple-system, "PingFang SC", sans-serif';
-  ctx.fillText('不服？搜「球迷含金量检测」来测', center, 880);
+  ctx.fillText('不服？搜「球迷含金量检测」来测', center, 856);
+
+  // 官方 tagline logo（黑字红 AI，放暖白底上）
+  try {
+    const tagline = await loadImage('./brand/tagline-xueai-laijiangren.png');
+    const tw = 270;
+    const th = (tagline.height / tagline.width) * tw;
+    ctx.drawImage(tagline, center - tw / 2, 890, tw, th);
+  } catch {
+    // tagline 加载失败不阻塞出图
+  }
 
   // 底部品牌黑条（与上方内容留足间隔）
   ctx.fillStyle = '#0D0F12';

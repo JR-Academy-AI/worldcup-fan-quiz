@@ -58,7 +58,8 @@ function Home({ onStart }: { onStart: () => void }) {
       </button>
       <p className="home-hint">本届 38 队 256 名在册球员随机出题 · 全程 90 秒</p>
       <p className="home-brand">
-        <img src="./brand/jr-box.svg" alt="" /> 匠人学院出品 · 学 AI 来匠人
+        <img src="./brand/jr-box.svg" alt="匠人学院" className="home-brand-box" />
+        <img src="./brand/tagline-xueai-laijiangren.png" alt="学 AI 来匠人" className="home-brand-tagline" />
       </p>
     </div>
   );
@@ -144,6 +145,8 @@ function Quiz({ quiz, onDone }: { quiz: Question[]; onDone: (ans: Answered[]) =>
   );
 }
 
+const DEFAULT_TITLE = '球迷含金量检测 ⚽ — 测测你是纯金球迷还是纯黄铜';
+
 function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void }) {
   const gold = useMemo(() => goldScore(answers), [answers]);
   const wrongCount = answers.filter((a) => !a.correct).length;
@@ -151,6 +154,14 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   const beaten = percentBeaten(gold);
   const [shown, setShown] = useState(0);
   const [poster, setPoster] = useState<string | null>(null);
+
+  // 微信里直接转发链接时，分享卡标题 = 当前 document.title → 变成晒成绩
+  useEffect(() => {
+    document.title = `我是${tier.name}，打败了全国 ${beaten}% 的球迷 ⚽`;
+    return () => {
+      document.title = DEFAULT_TITLE;
+    };
+  }, [tier.name, beaten]);
 
   // 含金量数字滚动
   useEffect(() => {
@@ -207,7 +218,8 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
           target="_blank"
           rel="noreferrer"
         >
-          学 AI 来匠人 →
+          <img src="./brand/tagline-xueai-laijiangren.png" alt="学 AI 来匠人" />
+          <span>→</span>
         </a>
         <p className="brand-site">jiangren.com.au</p>
       </div>

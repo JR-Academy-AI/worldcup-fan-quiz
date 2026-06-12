@@ -119,13 +119,12 @@ body::before {
 }
 .home-brand {
   margin-top: var(--jr-space-8);
-  font-size: var(--jr-fs-caption);
-  color: var(--jr-neutral-600);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--jr-space-2);
 }
-.home-brand img { width: 18px; height: 18px; }
+.home-brand-box { width: 22px; height: 22px; }
+.home-brand-tagline { height: 18px; }
 
 /* —— 按钮 —— */
 .btn-primary {
@@ -454,16 +453,18 @@ body::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--jr-space-2);
   background: var(--jr-white);
   color: var(--jr-black);
   text-decoration: none;
   font-size: var(--jr-fs-btn-lg);
   font-weight: var(--jr-fw-bold);
   border-radius: var(--jr-radius-sm);
-  padding: 14px 36px;
-  min-height: 50px;
+  padding: 14px 28px;
+  min-height: 54px;
   margin-top: var(--jr-space-1);
 }
+.brand-cta img { height: 28px; display: block; }
 .brand-cta:active { background: var(--jr-neutral-100); }
 .brand-site {
   font-size: var(--jr-fs-caption);
