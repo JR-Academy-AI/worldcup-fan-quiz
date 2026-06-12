@@ -43,7 +43,7 @@ function Home({ onStart }: { onStart: () => void }) {
         球迷<span className="gold-text">含金量</span>检测
       </h1>
       <p className="home-sub">
-        10 张球星脸，测出你看的是球，还是热闹。
+        15 张球星脸，测出你看的是球，还是热闹。
         <br />
         看球二十年？先过了这关再说。
       </p>
@@ -56,7 +56,7 @@ function Home({ onStart }: { onStart: () => void }) {
       <button className="btn-primary btn-big" onClick={onStart}>
         开始检测 →
       </button>
-      <p className="home-hint">本届 38 队 256 名在册球员随机出题 · 全程 90 秒</p>
+      <p className="home-hint">本届 38 队 256 名在册球员随机出题 · 全程 2 分钟</p>
       <p className="home-brand">
         <img src="./brand/jr-box.svg" alt="匠人学院" className="home-brand-box" />
         <img src="./brand/tagline-xueai-laijiangren.png" alt="学 AI 来匠人" className="home-brand-tagline" />
@@ -111,7 +111,7 @@ function Quiz({ quiz, onDone }: { quiz: Question[]; onDone: (ans: Answered[]) =>
             <i key={i} className={i < idx ? 'done' : i === idx ? 'now' : ''} />
           ))}
         </div>
-        <span className="q-total">/10</span>
+        <span className="q-total">/{quiz.length}</span>
       </div>
       <div className="photo-frame" key={q.player.id}>
         <div className="photo-card">
@@ -195,7 +195,7 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
           <p className="beaten-quip">{percentileQuip(beaten)}</p>
         </div>
         <p className="score-detail">
-          答对 {answers.length - wrongCount}/10 · 难题加权计分
+          答对 {answers.length - wrongCount}/{answers.length} · 难题加权计分
         </p>
       </div>
 

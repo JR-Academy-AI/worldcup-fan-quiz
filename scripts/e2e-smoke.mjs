@@ -17,7 +17,7 @@ await page.screenshot({ path: '/tmp/claude-b/.claude/jobs/85fefdb9/tmp/01-home.p
 
 await page.click('.btn-primary');
 let imgReport = [];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 15; i++) {
   await page.waitForSelector('.photo-card img', { timeout: 8000 });
   // 等图片真实加载
   const ok = await page.waitForFunction(

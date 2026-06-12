@@ -26,8 +26,8 @@ export interface Answered {
   correct: boolean;
 }
 
-// 含金量权重：3×6 + 4×10 + 3×14 = 100
-export const WEIGHT: Record<number, number> = { 1: 6, 2: 10, 3: 14 };
+// 含金量权重：5×4 + 5×6 + 5×10 = 100（难题占一半，满分必须通吃 5 道难题）
+export const WEIGHT: Record<number, number> = { 1: 4, 2: 6, 3: 10 };
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -55,7 +55,7 @@ function scrambleName(zh: string): string | null {
 
 export function buildQuiz(): Question[] {
   const byDiff = (d: number) => shuffle(PLAYERS.filter((p) => p.difficulty === d));
-  const picks = [...byDiff(1).slice(0, 3), ...byDiff(2).slice(0, 4), ...byDiff(3).slice(0, 3)];
+  const picks = [...byDiff(1).slice(0, 5), ...byDiff(2).slice(0, 5), ...byDiff(3).slice(0, 5)];
 
   return shuffle(picks).map((p) => {
     // 干扰项：1 个近音梗 + 真实球员名补足（同国优先，梗更足）
