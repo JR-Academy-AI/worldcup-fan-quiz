@@ -1,0 +1,10 @@
+{
+  "name": "worldcup-fan-quiz",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "假球迷鉴定器 — JR Academy 世界杯营销 H5（独立静态站）",
+  "scripts": {
+    "fetch:players": "node scripts/fetch-players.mjs"
+  }
+}
