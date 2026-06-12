@@ -39,40 +39,63 @@ function Home({ onStart }: { onStart: () => void }) {
       <div className="pitch-deco" aria-hidden />
       <div className="home-panel">
         <div className="home-topline">
-          <span>2026 世界杯特别企划</span>
-          <b>2 分钟</b>
+          <span className="home-pill">🏆 2026 世界杯特别企划</span>
+          <b className="home-pill">⏱ 2 分钟完成</b>
         </div>
-        <div className="home-ball">⚽</div>
+        <div className="home-hero-art" aria-hidden>
+          <div className="home-stadium-glow" />
+          <img src="./worldcup-assets/ball-badge.png" alt="" className="home-ball-img" />
+          <img src="./worldcup-assets/crown.png" alt="" className="home-crown-img" />
+        </div>
         <p className="home-kicker">World Cup Fan Check</p>
         <h1 className="home-title">
-          球迷<span className="gold-text">含金量</span>检测
+          <span>测测你的</span>
+          <strong>
+            球迷<span className="gold-text">含金量</span>
+          </strong>
         </h1>
         <p className="home-sub">
-          15 张球星脸，测出你看的是球，还是热闹。
+          15 张球星脸，一眼识破你的球迷段位。
           <br />
-          看球二十年？先过了这关再说。
+          真球迷，先过这关。
         </p>
+        <div className="tier-ribbon">你的球迷段位</div>
         <div className="tier-teaser">
-          <span>🥉 纯黄铜</span>
-          <span>🍺 电镀金</span>
-          <span>💍 24K</span>
-          <span>👑 球王</span>
+          <span>
+            <img src="./worldcup-assets/bronze-medal.png" alt="" />
+            纯黄铜
+          </span>
+          <span>
+            <img src="./worldcup-assets/beer.png" alt="" />
+            电镀金
+          </span>
+          <span>
+            <i>💍</i>
+            24K
+          </span>
+          <span>
+            <img src="./worldcup-assets/crown.png" alt="" />
+            球王
+          </span>
         </div>
         <button className="btn-primary btn-big" onClick={onStart}>
-          开始检测 →
+          立即测含金量 →
         </button>
         <div className="home-stats" aria-label="测试说明">
           <span>
-            <b>38</b>
-            支球队
-          </span>
-          <span>
+            <img src="./worldcup-assets/ball-badge.png" alt="" />
             <b>256</b>
-            名球员
+            名球员题库
           </span>
           <span>
+            <img src="./worldcup-assets/checklist.png" alt="" />
             <b>15</b>
-            题随机
+            道随机题
+          </span>
+          <span>
+            <img src="./worldcup-assets/ai-badge.png" alt="" />
+            <b>AI</b>
+            生成吐槽
           </span>
         </div>
       </div>
