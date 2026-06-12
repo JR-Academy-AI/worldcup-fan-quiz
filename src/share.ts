@@ -30,8 +30,14 @@ export async function makePoster(gold: number, tier: Tier, beaten: number): Prom
   ctx.font = '700 56px -apple-system, "PingFang SC", sans-serif';
   ctx.fillText(tier.name, center, 360);
 
-  // 含金量大数字
-  ctx.fillStyle = '#22C55E';
+  // 含金量大数字 —— 金色渐变，色值取自 --jr-* token（与页面一致）
+  const css = getComputedStyle(document.documentElement);
+  const yellow = css.getPropertyValue('--jr-yellow').trim() || '#FFC84D';
+  const red = css.getPropertyValue('--jr-red').trim() || '#FF4D4F';
+  const grad = ctx.createLinearGradient(center - 180, 420, center + 180, 560);
+  grad.addColorStop(0, yellow);
+  grad.addColorStop(1, mix(yellow, red, 0.38));
+  ctx.fillStyle = grad;
   ctx.font = '800 150px "SF Mono", Menlo, -apple-system, sans-serif';
   ctx.fillText(`${gold}%`, center, 540);
   ctx.fillStyle = '#6B7280';
@@ -71,6 +77,14 @@ export async function makePoster(gold: number, tier: Tier, beaten: number): Prom
   ctx.fillText('学 AI 来匠人 · jiangren.com.au', center, H - 32);
 
   return c.toDataURL('image/png');
+}
+
+// 两个 hex 颜色按比例混合（模拟 CSS color-mix）
+function mix(a: string, b: string, t: number): string {
+  const pa = a.match(/\w\w/g)!.map((x) => parseInt(x, 16));
+  const pb = b.match(/\w\w/g)!.map((x) => parseInt(x, 16));
+  const m = pa.map((v, i) => Math.round(v + (pb[i] - v) * t));
+  return `#${m.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 }
 
 function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxW: number, lineH: number) {

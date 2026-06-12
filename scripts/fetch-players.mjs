@@ -13,7 +13,13 @@ const ROOT = new URL('..', import.meta.url).pathname;
 const OUT_DIR = path.join(ROOT, 'public/players');
 const DATA_DIR = path.join(ROOT, 'data');
 
-const toSlug = (wiki) => wiki.replace(/[(),']/g, '').replace(/_+/g, '-').toLowerCase();
+// 纯 ASCII slug：重音字符在不同服务器/CDN 上不可靠，一律转写
+const toSlug = (wiki) =>
+  wiki.replace(/[(),']/g, '').replace(/_+/g, '-')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replaceAll('ø', 'o').replaceAll('Ø', 'o').replaceAll('ı', 'i').replaceAll('đ', 'd')
+    .replaceAll('Đ', 'd').replaceAll('ł', 'l').replaceAll('ß', 'ss').replaceAll('æ', 'ae')
+    .toLowerCase().replace(/[^a-z0-9-]/g, '');
 
 // 已下载的跳过
 let existingIds = new Set();
