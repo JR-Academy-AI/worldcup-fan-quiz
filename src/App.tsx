@@ -241,7 +241,7 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
             错题
           </span>
           <span>
-            <b>{gold}%</b>
+            <b>{shown}%</b>
             含金量
           </span>
         </div>

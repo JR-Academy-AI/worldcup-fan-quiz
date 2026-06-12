@@ -8,9 +8,14 @@
     <meta property="og:title" content="球迷含金量检测 ⚽" />
     <meta property="og:description" content="我刚测出球迷含金量，你敢测吗？" />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://jr-academy-ai.github.io/worldcup-fan-quiz/share-thumb.png" />
     <link rel="icon" href="./brand/jr-box.svg" />
   </head>
   <body>
+    <!-- 微信兜底抓图取页面第一张足够大的图 → 分享缩略图 -->
+    <div style="width: 0; height: 0; overflow: hidden">
+      <img src="./share-thumb.png" alt="" width="500" height="500" />
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

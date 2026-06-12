@@ -305,7 +305,7 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--jr-space-4) var(--jr-space-3) var(--jr-space-5);
+  padding: var(--jr-space-4) var(--jr-space-3) var(--jr-space-6);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--jr-white), transparent 28%), transparent 54%),
     var(--jr-surface-panel);
@@ -464,7 +464,7 @@ body::before {
   border: 1px solid var(--jr-border-warm-strong);
   border-radius: var(--jr-radius-lg);
   box-shadow: var(--jr-shadow-panel);
-  padding: var(--jr-space-14) var(--jr-space-4) var(--jr-space-5);
+  padding: var(--jr-space-14) var(--jr-space-4) var(--jr-space-6);
   display: flex;
   flex-direction: column;
   align-items: center;
