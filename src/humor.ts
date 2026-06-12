@@ -75,6 +75,18 @@ export function wrongQuip(a: Answered): string {
   return pool[Math.floor(Math.random() * pool.length)](n);
 }
 
+// 超时专属吐槽（比答错更扎心：你不是不会，是反应慢）
+const TIMEOUT_QUIPS = [
+  (n: string) => `5 秒都不够想？${n}站你面前你也认不出。`,
+  (n: string) => `时间到。${n}已经跑完一个反击了，你还在想。`,
+  (n: string) => `犹豫就是不认识。这位是${n}。`,
+];
+
+export function timeoutQuip(a: Answered): string {
+  const n = a.question.player.nameZh;
+  return TIMEOUT_QUIPS[Math.floor(Math.random() * TIMEOUT_QUIPS.length)](n);
+}
+
 const RIGHT_D3 = [
   '可以啊，这都认识，工资没少买球衣吧。',
   '冷门题都接得住，是真看球的。',

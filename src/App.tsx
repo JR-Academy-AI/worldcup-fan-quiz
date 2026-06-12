@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildQuiz, goldScore, percentBeaten, type Answered, type Question } from './quiz';
-import { percentileQuip, rightQuip, tierOf, wrongQuip } from './humor';
+import { percentileQuip, rightQuip, tierOf, timeoutQuip, wrongQuip } from './humor';
 import { makePoster } from './share';
 
 type Stage = 'home' | 'quiz' | 'result';
@@ -109,13 +109,18 @@ function Home({ onStart }: { onStart: () => void }) {
 }
 
 const LETTERS = ['A', 'B', 'C', 'D'];
+const COUNTDOWN_TENTHS = 50; // 每题 5 秒
+const TIMEOUT_PICK = '⏰ 超时未答';
 
 function Quiz({ quiz, onDone }: { quiz: Question[]; onDone: (ans: Answered[]) => void }) {
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Answered[]>([]);
   const [picked, setPicked] = useState<string | null>(null);
   const [quip, setQuip] = useState<string | null>(null);
+  const [tenths, setTenths] = useState(COUNTDOWN_TENTHS);
   const timer = useRef<number | undefined>(undefined);
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
 
   const q = quiz[idx];
 
@@ -128,33 +133,63 @@ function Quiz({ quiz, onDone }: { quiz: Question[]; onDone: (ans: Answered[]) =>
     }
   }, [idx, quiz]);
 
-  const pick = (opt: string) => {
-    if (picked) return;
-    const a: Answered = { question: q, picked: opt, correct: opt === q.player.nameZh };
-    setPicked(opt);
-    setQuip(a.correct ? rightQuip(a) : wrongQuip(a));
-    const next = [...answers, a];
+  const settle = (a: Answered, holdMs: number) => {
+    setPicked(a.picked);
+    setQuip(a.correct ? rightQuip(a) : a.picked === TIMEOUT_PICK ? timeoutQuip(a) : wrongQuip(a));
+    const next = [...answersRef.current, a];
     setAnswers(next);
     timer.current = window.setTimeout(() => {
       setPicked(null);
       setQuip(null);
       if (idx + 1 >= quiz.length) onDone(next);
       else setIdx(idx + 1);
-    }, a.correct ? 900 : 1700);
+    }, holdMs);
   };
 
+  const pick = (opt: string) => {
+    if (picked) return;
+    const correct = opt === q.player.nameZh;
+    settle({ question: q, picked: opt, correct }, correct ? 900 : 1700);
+  };
+
+  // 5 秒倒计时：每题重置，作答即停，归零按超时结算
+  useEffect(() => {
+    if (picked) return;
+    setTenths(COUNTDOWN_TENTHS);
+    const t = window.setInterval(() => {
+      setTenths((n) => {
+        if (n <= 1) {
+          window.clearInterval(t);
+          settle({ question: quiz[idx], picked: TIMEOUT_PICK, correct: false }, 1700);
+          return 0;
+        }
+        return n - 1;
+      });
+    }, 100);
+    return () => window.clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, picked]);
+
   useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  const urgency = picked ? 'paused' : tenths <= 20 ? 'danger' : tenths <= 30 ? 'warn' : 'ok';
 
   return (
     <div className="screen">
       <div className="progress">
-        <span className="q-num">Q{idx + 1}</span>
-        <div className="dots">
-          {quiz.map((_, i) => (
-            <i key={i} className={i < idx ? 'done' : i === idx ? 'now' : ''} />
-          ))}
+        <div className="progress-copy">
+          <span className="q-num">Q{idx + 1}</span>
+          <span className="q-total">/{quiz.length}</span>
         </div>
-        <span className="q-total">/{quiz.length}</span>
+        <div className="progress-track" aria-label={`第 ${idx + 1} 题，共 ${quiz.length} 题`}>
+          <span className="progress-fill" style={{ width: `${((idx + 1) / quiz.length) * 100}%` }} />
+          <div className="dots">
+            {quiz.map((_, i) => (
+              <i key={i} className={i < idx ? 'done' : i === idx ? 'now' : ''} />
+            ))}
+          </div>
+        </div>
+        <span className="progress-badge">{idx + 1}/{quiz.length}</span>
       </div>
       <div className="quiz-card">
         <div className="photo-frame" key={q.player.id}>
@@ -164,6 +199,12 @@ function Quiz({ quiz, onDone }: { quiz: Question[]; onDone: (ans: Answered[]) =>
           <span className="photo-tag">⚽ 2026 世界杯在册球员</span>
         </div>
         <h2 className="q-title">这位是谁？</h2>
+        <div className={`countdown ${urgency}`} aria-label="倒计时">
+          <span className="countdown-num">{picked ? '⏸' : `${Math.ceil(tenths / 10)}s`}</span>
+          <span className="countdown-track">
+            <i style={{ width: `${(tenths / COUNTDOWN_TENTHS) * 100}%` }} />
+          </span>
+        </div>
       </div>
       <div className="options">
         {q.options.map((opt, i) => {

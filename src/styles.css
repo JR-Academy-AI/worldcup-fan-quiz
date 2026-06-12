@@ -374,18 +374,30 @@ body::before {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--jr-space-3);
-  padding: var(--jr-space-2) 0 var(--jr-space-3);
+  gap: var(--jr-space-2);
+  padding: var(--jr-space-2);
   position: sticky;
-  top: 0;
+  top: var(--jr-space-2);
   z-index: 5;
-  background: color-mix(in srgb, var(--jr-surface-canvas), transparent 10%);
-  backdrop-filter: blur(10px);
+  margin-bottom: var(--jr-space-2);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--jr-white), transparent 10%), color-mix(in srgb, var(--jr-surface-panel), transparent 4%));
+  border: 1px solid var(--jr-border-warm-strong);
+  border-radius: var(--jr-radius-xl);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--jr-black), transparent 88%);
+  backdrop-filter: blur(14px);
+}
+.progress-copy {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  min-width: 48px;
 }
 .q-num {
   color: var(--jr-red);
   font-weight: var(--jr-fw-bold);
-  font-size: var(--jr-fs-h3);
+  font-size: 22px;
+  line-height: 1;
   font-family: var(--jr-font-mono);
 }
 .q-total {
@@ -393,27 +405,69 @@ body::before {
   font-size: var(--jr-fs-caption);
   font-family: var(--jr-font-mono);
 }
-.dots {
+.progress-track {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 28px;
   display: flex;
-  gap: 5px;
+  align-items: center;
+  padding: 0 6px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--jr-green), var(--jr-white) 54%);
+  border-radius: var(--jr-radius-full);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--jr-neutral-100), var(--jr-white) 40%), var(--jr-surface-panel-alt));
+}
+.progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--jr-green), var(--jr-black) 6%), var(--jr-green), color-mix(in srgb, var(--jr-yellow), var(--jr-green) 35%));
+  box-shadow: 0 0 18px color-mix(in srgb, var(--jr-green), transparent 55%);
+  transition: width var(--jr-dur-base) var(--jr-ease-standard);
+}
+.dots {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px;
   flex: 1;
 }
 .dots i {
-  flex: 1;
+  flex: 0 0 8px;
+  width: 8px;
   height: 8px;
   border-radius: var(--jr-radius-full);
-  background: var(--jr-neutral-100);
-  border: 1px solid var(--jr-neutral-300);
-  transition: all var(--jr-dur-base);
+  background: color-mix(in srgb, var(--jr-white), transparent 16%);
+  border: 1px solid color-mix(in srgb, var(--jr-neutral-300), var(--jr-white) 30%);
+  box-shadow: inset 0 1px 1px color-mix(in srgb, var(--jr-white), transparent 20%);
+  transition: background var(--jr-dur-base), border-color var(--jr-dur-base), transform var(--jr-dur-base);
 }
 .dots i.done {
-  background: var(--jr-green);
-  border-color: var(--jr-green);
+  background: var(--jr-white);
+  border-color: color-mix(in srgb, var(--jr-green), var(--jr-white) 35%);
 }
 .dots i.now {
   background: var(--jr-black);
   border-color: var(--jr-black);
-  transform: scaleY(1.4);
+  transform: scale(1.35);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--jr-black), transparent 88%);
+}
+.progress-badge {
+  flex: 0 0 auto;
+  min-width: 42px;
+  border-radius: var(--jr-radius-full);
+  background: var(--jr-black);
+  color: var(--jr-white);
+  font-family: var(--jr-font-mono);
+  font-size: var(--jr-fs-caption);
+  font-weight: var(--jr-fw-bold);
+  line-height: 1;
+  padding: 8px 9px;
 }
 
 .quiz-card {
@@ -421,7 +475,7 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--jr-space-4) var(--jr-space-3) var(--jr-space-6);
+  padding: var(--jr-space-3) var(--jr-space-3) var(--jr-space-5, 20px);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--jr-white), transparent 28%), transparent 54%),
     var(--jr-surface-panel);
@@ -554,7 +608,7 @@ body::before {
 
 .quip {
   width: 100%;
-  min-height: 48px;
+  min-height: 0;
   margin-top: var(--jr-space-4);
   font-size: var(--jr-fs-body-1);
   color: var(--jr-neutral-900);
@@ -562,11 +616,71 @@ body::before {
   background: color-mix(in srgb, var(--jr-surface-panel-alt), var(--jr-white) 24%);
   border: 1px dashed var(--jr-border-warm-strong);
   border-radius: var(--jr-radius-sm);
-  padding: var(--jr-space-3);
+  padding: 0 var(--jr-space-3);
   opacity: 0;
-  transition: opacity var(--jr-dur-base);
+  max-height: 0;
+  overflow: hidden;
+  border-color: transparent;
+  transition: opacity var(--jr-dur-base), max-height var(--jr-dur-base), padding var(--jr-dur-base);
 }
-.quip.show { opacity: 1; }
+.quip.show {
+  opacity: 1;
+  max-height: 96px;
+  padding: var(--jr-space-3);
+  border-color: var(--jr-border-warm-strong);
+}
+
+/* —— 每题 5 秒倒计时 —— */
+.countdown {
+  width: min(72vw, 310px);
+  min-height: 32px;
+  margin: var(--jr-space-4) auto 0;
+  display: flex;
+  align-items: center;
+  gap: var(--jr-space-3);
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--jr-green), var(--jr-white) 50%);
+  border-radius: var(--jr-radius-full);
+  background: color-mix(in srgb, var(--jr-surface-panel), var(--jr-white) 26%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--jr-white), transparent 20%);
+}
+.countdown-num {
+  flex: 0 0 42px;
+  font-family: var(--jr-font-mono);
+  font-size: var(--jr-fs-body-1);
+  font-weight: var(--jr-fw-bold);
+  text-align: center;
+  line-height: 1;
+}
+.countdown-track {
+  flex: 1;
+  height: 7px;
+  border-radius: var(--jr-radius-full);
+  background: color-mix(in srgb, var(--jr-neutral-100), var(--jr-white) 28%);
+  border: 1px solid color-mix(in srgb, var(--jr-neutral-300), var(--jr-white) 36%);
+  overflow: hidden;
+}
+.countdown-track i {
+  display: block;
+  height: 100%;
+  border-radius: var(--jr-radius-full);
+  transition: width 100ms linear, background var(--jr-dur-base);
+}
+.countdown.ok .countdown-num { color: var(--jr-green); }
+.countdown.ok .countdown-track i { background: var(--jr-green); }
+.countdown.warn .countdown-num { color: var(--jr-yellow); }
+.countdown.warn .countdown-track i { background: var(--jr-yellow); }
+.countdown.danger .countdown-num {
+  color: var(--jr-red-text);
+  animation: tick-pulse 0.5s infinite;
+}
+.countdown.danger .countdown-track i { background: var(--jr-red); }
+.countdown.paused .countdown-num { color: var(--jr-neutral-600); }
+.countdown.paused .countdown-track i { background: var(--jr-neutral-300); }
+@keyframes tick-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
 
 /* —— 结果页 —— */
 .result { text-align: center; }
