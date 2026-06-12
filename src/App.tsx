@@ -180,6 +180,14 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   // 微信里直接转发链接时，分享卡标题 = 当前 document.title → 变成晒成绩
   useEffect(() => {
     document.title = `我是${tier.name}，打败了全国 ${beaten}% 的球迷 ⚽`;
+    // iOS 微信不随 SPA 更新 title 的经典 hack：挂一个瞬时 iframe 强制刷新
+    if (/MicroMessenger/i.test(navigator.userAgent) && /iP(hone|ad|od)/i.test(navigator.userAgent)) {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = './brand/jr-box.svg';
+      iframe.onload = () => window.setTimeout(() => iframe.remove(), 0);
+      document.body.appendChild(iframe);
+    }
     return () => {
       document.title = DEFAULT_TITLE;
     };
@@ -200,7 +208,10 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   return (
     <div className="screen result">
       <div className="hero-card">
-        <p className="result-kicker">检测结果</p>
+        <div className="result-header">
+          <p className="result-kicker">检测结果</p>
+          <span>本局战报</span>
+        </div>
         <div className="medal-ring">
           <span>{tier.emoji}</span>
         </div>
@@ -220,6 +231,20 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
         <p className="score-detail">
           答对 {answers.length - wrongCount}/{answers.length} · 难题加权计分
         </p>
+        <div className="result-metrics" aria-label="本次答题数据">
+          <span>
+            <b>{answers.length - wrongCount}</b>
+            答对
+          </span>
+          <span>
+            <b>{wrongCount}</b>
+            错题
+          </span>
+          <span>
+            <b>{gold}%</b>
+            含金量
+          </span>
+        </div>
       </div>
 
       <div className="actions">
