@@ -34,6 +34,7 @@ export async function makePoster(gold: number, tier: Tier, beaten: number, answe
   ctx.shadowBlur = 6;
   fitText(ctx, tier.name, 650, 407, 330, 31, '#FFF3D0');
   ctx.shadowBlur = 0;
+  drawShieldBadge(ctx, tier.name);
 
   ctx.shadowColor = 'rgba(107,46,0,.35)';
   ctx.shadowBlur = 8;
@@ -116,6 +117,28 @@ function personaCards(gold: number, correct: number, total: number) {
       stars: gold === 100 ? 4 : 3,
     },
   ];
+}
+
+function drawShieldBadge(ctx: CanvasRenderingContext2D, tierName: string) {
+  const parts = tierName.split(' · ');
+  const titleLines = parts.length > 1 ? parts : [tierName];
+
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.45)';
+  ctx.shadowBlur = 8;
+  fitText(ctx, '球迷段位', 236, 436, 150, 24, '#F7D38A', 'center', 900);
+  ctx.shadowBlur = 4;
+
+  if (titleLines.length === 1) {
+    fitText(ctx, titleLines[0], 236, 498, 168, 32, '#FFF7D6', 'center', 900);
+  } else {
+    fitText(ctx, titleLines[0], 236, 488, 168, 31, '#FFF7D6', 'center', 900);
+    fitText(ctx, titleLines.slice(1).join(' · '), 236, 532, 176, 27, '#FFF7D6', 'center', 900);
+  }
+
+  ctx.fillStyle = 'rgba(247,211,138,.86)';
+  ctx.fillRect(172, 560, 128, 2);
+  ctx.restore();
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
