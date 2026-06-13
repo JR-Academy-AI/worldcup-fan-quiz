@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildQuiz, goldScore, percentBeaten, PLAYERS, type Answered, type Question } from './quiz';
 import { percentileQuip, rightQuip, tierOf, timeoutQuip, wrongQuip } from './humor';
 import { makePoster } from './share';
+import { track } from './track';
 
 type Stage = 'home' | 'quiz' | 'result';
 
@@ -10,18 +11,20 @@ export default function App() {
   const [quiz, setQuiz] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answered[]>([]);
 
-  // 微信分享缩略图随机换成球星脸（只用难度 1 的国民级面孔，保证缩略图一眼认出）
+  // 微信分享缩略图随机换成球星脸（只用难度 1 的国民级面孔，保证缩略图一眼认出）+ 落地页埋点
   useEffect(() => {
     const stars = PLAYERS.filter((p) => p.difficulty === 1);
     const star = stars[Math.floor(Math.random() * stars.length)];
     const img = document.getElementById('share-thumb-img') as HTMLImageElement | null;
     if (img && star) img.src = star.image;
+    track('page_view');
   }, []);
 
   const start = () => {
     setQuiz(buildQuiz());
     setAnswers([]);
     setStage('quiz');
+    track('quiz_start');
   };
 
   return (
@@ -264,6 +267,7 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   };
 
   const share = async () => {
+    track('share_click', { tier: tier.name, goldScore: gold });
     if (/MicroMessenger/i.test(navigator.userAgent)) {
       setShareGuide(true); // 微信内：引导点右上角 ··· 菜单
       return;
@@ -296,6 +300,12 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
       document.title = DEFAULT_TITLE;
     };
   }, [shareTitle]);
+
+  // 完成埋点：进结果页上报一次，带含金量 / 答对数 / 称号
+  useEffect(() => {
+    track('quiz_complete', { goldScore: gold, correctCount: answers.length - wrongCount, tier: tier.name });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 含金量数字滚动
   useEffect(() => {
@@ -394,7 +404,10 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
       <div className="actions">
         <button
           className="btn-primary btn-big"
-          onClick={async () => setPoster(await makePoster(gold, tier, beaten, answers, displayName))}
+          onClick={async () => {
+            track('share_click', { tier: tier.name, goldScore: gold, via: 'poster' });
+            setPoster(await makePoster(gold, tier, beaten, answers, displayName));
+          }}
         >
           <img src="./worldcup-assets/result-trophy.png" alt="" className="action-icon" />
           生成我的含金量战报
