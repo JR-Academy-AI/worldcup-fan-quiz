@@ -251,6 +251,17 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   const [poster, setPoster] = useState<string | null>(null);
   const [shareGuide, setShareGuide] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [name, setName] = useState(() => localStorage.getItem('wcq_name') ?? '');
+
+  const displayName = name.trim() || '本帝';
+  // 挑衅叫板文案：带名字 → 朋友圈里是「XX的战绩」而非一个匿名测试，逼对方不服来战
+  const shareTitle = `${displayName}的球迷含金量 ${gold}%，打败了全国 ${beaten}% 的人，不服来测！⚽`;
+
+  const onName = (v: string) => {
+    const clean = v.slice(0, 8); // 限 8 字，防刷屏 + 海报排版不崩
+    setName(clean);
+    localStorage.setItem('wcq_name', clean);
+  };
 
   const share = async () => {
     if (/MicroMessenger/i.test(navigator.userAgent)) {
@@ -259,20 +270,20 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
     }
     if (navigator.share) {
       try {
-        await navigator.share({ title: document.title, text: tier.shareLine, url: location.href });
+        await navigator.share({ title: shareTitle, text: shareTitle, url: location.href });
       } catch {
         // 用户取消系统分享面板，无需处理
       }
       return;
     }
-    await navigator.clipboard?.writeText(`${tier.shareLine} ${location.href}`);
+    await navigator.clipboard?.writeText(`${shareTitle} ${location.href}`);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
   };
 
-  // 微信里直接转发链接时，分享卡标题 = 当前 document.title → 变成晒成绩
+  // 微信里直接转发链接时，分享卡标题 = 当前 document.title → 变成「XX的战绩，不服来测」
   useEffect(() => {
-    document.title = `我是${tier.name}，打败了全国 ${beaten}% 的球迷 ⚽`;
+    document.title = shareTitle;
     // iOS 微信不随 SPA 更新 title 的经典 hack：挂一个瞬时 iframe 强制刷新
     if (/MicroMessenger/i.test(navigator.userAgent) && /iP(hone|ad|od)/i.test(navigator.userAgent)) {
       const iframe = document.createElement('iframe');
@@ -284,7 +295,7 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
     return () => {
       document.title = DEFAULT_TITLE;
     };
-  }, [tier.name, beaten]);
+  }, [shareTitle]);
 
   // 含金量数字滚动
   useEffect(() => {
@@ -367,8 +378,24 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
         </section>
       </div>
 
+      <div className="name-box">
+        <label htmlFor="wcq-name">✍️ 签上大名，分享出去就是「{displayName}的战绩」</label>
+        <input
+          id="wcq-name"
+          type="text"
+          value={name}
+          onChange={(e) => onName(e.target.value)}
+          placeholder="留空默认叫你「本帝」"
+          maxLength={8}
+          autoComplete="off"
+        />
+      </div>
+
       <div className="actions">
-        <button className="btn-primary btn-big" onClick={async () => setPoster(await makePoster(gold, tier, beaten, answers))}>
+        <button
+          className="btn-primary btn-big"
+          onClick={async () => setPoster(await makePoster(gold, tier, beaten, answers, displayName))}
+        >
           <img src="./worldcup-assets/result-trophy.png" alt="" className="action-icon" />
           生成我的含金量战报
         </button>

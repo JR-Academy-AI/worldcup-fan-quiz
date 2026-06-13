@@ -15,7 +15,13 @@ const QR_OPTIONS: PosterQr[] = [
 ];
 
 // canvas 生成朋友圈分享图。用设计稿作为底图，只绘制动态分数、点评、人设和随机二维码。
-export async function makePoster(gold: number, tier: Tier, beaten: number, answers: Answered[]): Promise<string> {
+export async function makePoster(
+  gold: number,
+  tier: Tier,
+  beaten: number,
+  answers: Answered[],
+  name = '本帝',
+): Promise<string> {
   const c = document.createElement('canvas');
   c.width = W;
   c.height = H;
@@ -29,6 +35,9 @@ export async function makePoster(gold: number, tier: Tier, beaten: number, answe
   const topRank = 100 - beaten;
 
   ctx.drawImage(template, 0, 0, W, H);
+
+  // 名字标签：称号上方一行「{name} 的鉴定结果」
+  fitText(ctx, `${name} 的鉴定结果`, 650, 360, 330, 26, '#F7DFA6');
 
   ctx.shadowColor = 'rgba(0,0,0,.28)';
   ctx.shadowBlur = 6;

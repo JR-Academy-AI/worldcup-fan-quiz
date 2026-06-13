@@ -804,6 +804,43 @@ body::before {
   font-size: var(--jr-fs-caption);
   color: var(--jr-neutral-300);
 }
+/* —— 结果页签名输入框 —— */
+.name-box {
+  width: 100%;
+  margin-top: var(--jr-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--jr-space-2);
+}
+.name-box label {
+  font-size: var(--jr-fs-body-1);
+  font-weight: var(--jr-fw-semibold);
+  color: var(--jr-neutral-900);
+  text-align: center;
+}
+.name-box input {
+  width: 100%;
+  min-height: 50px;
+  text-align: center;
+  font-family: inherit;
+  font-size: var(--jr-fs-h3);
+  font-weight: var(--jr-fw-bold);
+  color: var(--jr-neutral-900);
+  background: var(--jr-surface-panel);
+  border: 2px solid var(--jr-border-warm-strong);
+  border-radius: var(--jr-radius-sm);
+  outline: none;
+  transition: border-color var(--jr-dur-fast);
+}
+.name-box input:focus {
+  border-color: var(--jr-green);
+  box-shadow: 0 0 0 4px var(--jr-focus-ring);
+}
+.name-box input::placeholder {
+  color: var(--jr-neutral-300);
+  font-weight: var(--jr-fw-medium);
+}
+
 .copy-toast {
   position: fixed;
   left: 50%;
