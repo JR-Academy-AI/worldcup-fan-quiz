@@ -493,7 +493,8 @@ body::before {
   to { transform: none; opacity: 1; }
 }
 .photo-card {
-  width: min(78vw, 338px);
+  /* 用视口高度限尺寸：照片 + 4 选项 + 倒计时 + 吐槽条一屏放下，小屏自动收缩 */
+  width: min(58vw, 30dvh, 240px);
   aspect-ratio: 1;
   border-radius: var(--jr-radius-xl);
   overflow: hidden;
@@ -527,9 +528,9 @@ body::before {
 }
 
 .q-title {
-  font-size: var(--jr-fs-h2);
+  font-size: var(--jr-fs-h3);
   font-weight: var(--jr-fw-bold);
-  margin: var(--jr-space-6) 0 0;
+  margin: var(--jr-space-4) 0 0;
 }
 
 .options {
@@ -632,9 +633,9 @@ body::before {
 
 /* —— 每题 5 秒倒计时 —— */
 .countdown {
-  width: min(72vw, 310px);
+  width: min(58vw, 240px);
   min-height: 32px;
-  margin: var(--jr-space-4) auto 0;
+  margin: var(--jr-space-3) auto 0;
   display: flex;
   align-items: center;
   gap: var(--jr-space-3);
@@ -693,9 +694,9 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(360px 220px at 50% 0%, color-mix(in srgb, var(--jr-yellow), transparent 62%), transparent 72%),
-    radial-gradient(420px 320px at 50% 18%, color-mix(in srgb, var(--jr-purple), transparent 68%), transparent 72%),
-    linear-gradient(180deg, color-mix(in srgb, var(--jr-black), var(--jr-green) 14%) 0 54%, var(--jr-surface-canvas) 54%);
+    linear-gradient(180deg, color-mix(in srgb, var(--jr-black), transparent 20%) 0 48%, color-mix(in srgb, var(--jr-black), transparent 62%) 68%, color-mix(in srgb, var(--jr-surface-canvas), transparent 5%) 100%),
+    url('/worldcup-assets/result-stadium-bg.png') center top / cover no-repeat,
+    var(--jr-black);
 }
 .hero-card {
   width: 100%;
@@ -746,6 +747,76 @@ body::before {
   content: '⌁';
   color: var(--jr-yellow);
   margin: 0 12px;
+}
+
+/* —— 右上角分享按钮 + 微信引导浮层 —— */
+.share-fab {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--jr-white);
+  color: var(--jr-black);
+  border: none;
+  border-radius: var(--jr-radius-full);
+  font-family: inherit;
+  font-size: var(--jr-fs-body-1);
+  font-weight: var(--jr-fw-bold);
+  padding: 8px 14px;
+  cursor: pointer;
+  box-shadow: var(--jr-shadow-md);
+  text-shadow: none;
+}
+.share-fab:active { transform: translateY(-50%) scale(0.95); }
+.share-guide {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 15, 18, 0.85);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 16px 24px;
+  color: var(--jr-white);
+  text-align: right;
+}
+.share-guide-arrow {
+  font-size: 64px;
+  line-height: 1;
+  animation: nudge 0.9s ease-in-out infinite;
+}
+@keyframes nudge {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(8px, -8px); }
+}
+.share-guide-text {
+  font-size: var(--jr-fs-h3);
+  font-weight: var(--jr-fw-semibold);
+  line-height: 1.7;
+  margin-top: var(--jr-space-3);
+}
+.share-guide-text b { color: var(--jr-yellow); }
+.share-guide-tip {
+  margin-top: var(--jr-space-3);
+  font-size: var(--jr-fs-caption);
+  color: var(--jr-neutral-300);
+}
+.copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 64px;
+  transform: translateX(-50%);
+  background: var(--jr-black);
+  color: var(--jr-white);
+  font-size: var(--jr-fs-body-1);
+  border-radius: var(--jr-radius-full);
+  padding: 10px 20px;
+  z-index: 200;
+  box-shadow: var(--jr-shadow-lg);
+  white-space: nowrap;
 }
 .medal-ring {
   display: flex;
@@ -832,30 +903,35 @@ body::before {
   box-shadow: 0 12px 26px color-mix(in srgb, var(--jr-black), transparent 80%);
 }
 .rank-badge {
-  width: 78px;
-  height: 78px;
+  width: 86px;
+  height: 86px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px solid color-mix(in srgb, var(--jr-yellow), var(--jr-white) 16%);
-  border-radius: var(--jr-radius-lg);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--jr-black), var(--jr-purple) 34%),
-      color-mix(in srgb, var(--jr-black), var(--jr-green) 12%)
-    );
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--jr-white), transparent 84%);
+  position: relative;
+  filter: drop-shadow(0 8px 12px color-mix(in srgb, var(--jr-black), transparent 58%));
+}
+.rank-badge img {
+  position: absolute;
+  inset: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  object-fit: contain;
 }
 .rank-badge span {
+  position: relative;
+  z-index: 1;
+  margin-top: -4px;
   font-size: 11px;
   color: color-mix(in srgb, var(--jr-yellow), var(--jr-white) 20%);
   font-weight: var(--jr-fw-bold);
 }
 .rank-badge b {
+  position: relative;
+  z-index: 1;
   font-family: var(--jr-font-mono);
-  font-size: 28px;
+  font-size: 26px;
   line-height: 1;
   color: var(--jr-yellow);
 }

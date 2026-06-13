@@ -246,8 +246,29 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   const wrongCount = answers.filter((a) => !a.correct).length;
   const tier = useMemo(() => tierOf(gold, wrongCount === answers.length), [gold, wrongCount, answers.length]);
   const beaten = percentBeaten(gold);
+  const topRank = 100 - beaten;
   const [shown, setShown] = useState(0);
   const [poster, setPoster] = useState<string | null>(null);
+  const [shareGuide, setShareGuide] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const share = async () => {
+    if (/MicroMessenger/i.test(navigator.userAgent)) {
+      setShareGuide(true); // 微信内：引导点右上角 ··· 菜单
+      return;
+    }
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: document.title, text: tier.shareLine, url: location.href });
+      } catch {
+        // 用户取消系统分享面板，无需处理
+      }
+      return;
+    }
+    await navigator.clipboard?.writeText(`${tier.shareLine} ${location.href}`);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  };
 
   // 微信里直接转发链接时，分享卡标题 = 当前 document.title → 变成晒成绩
   useEffect(() => {
@@ -284,6 +305,13 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
         <img src="./worldcup-assets/result-ribbon-beer.png" alt="" className="result-ribbon-art" />
         <div className="result-titlebar">
           <span>球迷含金量检测</span>
+          <button className="share-fab" onClick={share} aria-label="分享战绩">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+              <line x1="8.6" y1="10.5" x2="15.4" y2="6.5" /><line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
+            </svg>
+            分享
+          </button>
         </div>
         <h2 className="tier-name">{tier.name}</h2>
         <div className="gold-num gold-text">
@@ -295,8 +323,9 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
 
         <div className="rank-panel">
           <div className="rank-badge">
+            <img src="./worldcup-assets/result-rank-shield.png" alt="" />
             <span>TOP</span>
-            <b>{beaten}%</b>
+            <b>{topRank}%</b>
           </div>
           <div className="rank-copy">
             <p className="beaten">
@@ -383,6 +412,20 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
         </ul>
         <p>本页面为球迷娱乐内容，与 FIFA 及任何球员无关联、无代言关系。</p>
       </details>
+
+      {copied && <div className="copy-toast">✅ 战绩链接已复制，去粘贴给朋友吧</div>}
+
+      {shareGuide && (
+        <div className="share-guide" onClick={() => setShareGuide(false)}>
+          <div className="share-guide-arrow">↗</div>
+          <div className="share-guide-text">
+            点右上角「···」
+            <br />
+            选择 <b>分享到朋友圈</b> 或 <b>发送给朋友</b>
+          </div>
+          <p className="share-guide-tip">分享卡片会自动带上你的战绩标题</p>
+        </div>
+      )}
 
       {poster && (
         <div className="poster-mask" onClick={() => setPoster(null)}>
