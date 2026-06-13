@@ -368,7 +368,7 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
       </div>
 
       <div className="actions">
-        <button className="btn-primary btn-big" onClick={async () => setPoster(await makePoster(gold, tier, beaten))}>
+        <button className="btn-primary btn-big" onClick={async () => setPoster(await makePoster(gold, tier, beaten, answers))}>
           <img src="./worldcup-assets/result-trophy.png" alt="" className="action-icon" />
           生成我的含金量战报
         </button>
