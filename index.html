@@ -12,9 +12,9 @@
     <link rel="icon" href="./brand/jr-box.svg" />
   </head>
   <body>
-    <!-- 微信兜底抓图取页面第一张足够大的图 → 分享缩略图 -->
+    <!-- 微信兜底抓图取页面第一张足够大的图 → 分享缩略图；JS 加载后随机替换成球星脸 -->
     <div style="width: 0; height: 0; overflow: hidden">
-      <img src="./share-thumb.png" alt="" width="500" height="500" />
+      <img id="share-thumb-img" src="./share-thumb.png" alt="" width="500" height="500" />
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

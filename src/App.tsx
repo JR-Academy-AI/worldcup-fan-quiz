@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { buildQuiz, goldScore, percentBeaten, type Answered, type Question } from './quiz';
+import { buildQuiz, goldScore, percentBeaten, PLAYERS, type Answered, type Question } from './quiz';
 import { percentileQuip, rightQuip, tierOf, timeoutQuip, wrongQuip } from './humor';
 import { makePoster } from './share';
 
@@ -9,6 +9,14 @@ export default function App() {
   const [stage, setStage] = useState<Stage>('home');
   const [quiz, setQuiz] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answered[]>([]);
+
+  // 微信分享缩略图随机换成球星脸（只用难度 1 的国民级面孔，保证缩略图一眼认出）
+  useEffect(() => {
+    const stars = PLAYERS.filter((p) => p.difficulty === 1);
+    const star = stars[Math.floor(Math.random() * stars.length)];
+    const img = document.getElementById('share-thumb-img') as HTMLImageElement | null;
+    if (img && star) img.src = star.image;
+  }, []);
 
   const start = () => {
     setQuiz(buildQuiz());
@@ -272,48 +280,68 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   return (
     <div className="screen result">
       <div className="hero-card">
-        <div className="result-header">
-          <p className="result-kicker">检测结果</p>
-          <span>本局战报</span>
-        </div>
-        <div className="medal-ring">
-          <span>{tier.emoji}</span>
+        <img src="./worldcup-assets/result-frame.png" alt="" className="result-frame-art" />
+        <img src="./worldcup-assets/result-ribbon-beer.png" alt="" className="result-ribbon-art" />
+        <div className="result-titlebar">
+          <span>球迷含金量检测</span>
         </div>
         <h2 className="tier-name">{tier.name}</h2>
         <div className="gold-num gold-text">
           {shown}
           <span>%</span>
         </div>
-        <p className="gold-label">⚜️ 球迷含金量 ⚜️</p>
+        <p className="gold-label">⚽ 球迷含金量 ⚽</p>
         <p className="tier-line">“{tier.line}”</p>
-        <div className="beaten-box">
-          <p className="beaten">
-            打败了全国 <b>{beaten}%</b> 的球迷
-          </p>
-          <p className="beaten-quip">{percentileQuip(beaten)}</p>
+
+        <div className="rank-panel">
+          <div className="rank-badge">
+            <span>TOP</span>
+            <b>{beaten}%</b>
+          </div>
+          <div className="rank-copy">
+            <p className="beaten">
+              打败了全国 <b>{beaten}%</b> 的球迷
+            </p>
+            <p className="beaten-quip">{percentileQuip(beaten)}</p>
+          </div>
         </div>
-        <p className="score-detail">
-          答对 {answers.length - wrongCount}/{answers.length} · 难题加权计分
-        </p>
+
         <div className="result-metrics" aria-label="本次答题数据">
           <span>
-            <b>{answers.length - wrongCount}</b>
-            答对
+            <b>🎯 答对 {answers.length - wrongCount}/{answers.length}</b>
           </span>
           <span>
-            <b>{wrongCount}</b>
-            错题
-          </span>
-          <span>
-            <b>{shown}%</b>
-            含金量
+            <b>⚖️ 难题加权计算</b>
           </span>
         </div>
+
+        <section className="persona-card" aria-label="你的看球人设">
+          <h3>你的看球人设</h3>
+          <div className="persona-tags">
+            <span>
+              <img src="./worldcup-assets/result-football-fan.png" alt="" />
+              进球就欢呼
+            </span>
+            <span>
+              <img src="./worldcup-assets/result-cup.png" alt="" />
+              重在参与
+            </span>
+          </div>
+        </section>
+
+        <section className="ai-verdict">
+          <img src="./worldcup-assets/result-robot.png" alt="" />
+          <div>
+            <h3>AI 毒舌点评</h3>
+            <p>兄弟，你的足球知识像薯片一样薄，但快乐是真的！</p>
+          </div>
+        </section>
       </div>
 
       <div className="actions">
         <button className="btn-primary btn-big" onClick={async () => setPoster(await makePoster(gold, tier, beaten))}>
-          📸 生成我的含金量战报
+          <img src="./worldcup-assets/result-trophy.png" alt="" className="action-icon" />
+          生成我的含金量战报
         </button>
         <button className="btn-ghost" onClick={onRetry}>
           🔄 再测一次（换一批题）
