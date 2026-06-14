@@ -255,6 +255,7 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   const [shareGuide, setShareGuide] = useState(false);
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState(() => localStorage.getItem('wcq_name') ?? '');
+  const [nameModal, setNameModal] = useState(true); // 进结果页先弹窗签名（可跳过）
 
   const displayName = name.trim() || '本帝';
   // 挑衅叫板文案：带名字 → 朋友圈里是「XX的战绩」而非一个匿名测试，逼对方不服来战
@@ -388,18 +389,10 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
         </section>
       </div>
 
-      <div className="name-box">
-        <label htmlFor="wcq-name">✍️ 签上大名，分享出去就是「{displayName}的战绩」</label>
-        <input
-          id="wcq-name"
-          type="text"
-          value={name}
-          onChange={(e) => onName(e.target.value)}
-          placeholder="留空默认叫你「本帝」"
-          maxLength={8}
-          autoComplete="off"
-        />
-      </div>
+      <button className="name-reopen" onClick={() => setNameModal(true)}>
+        ✍️ 分享署名：<b>{displayName}</b>
+        <span>改名</span>
+      </button>
 
       <div className="actions">
         <button
@@ -464,6 +457,36 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
             选择 <b>分享到朋友圈</b> 或 <b>发送给朋友</b>
           </div>
           <p className="share-guide-tip">分享卡片会自动带上你的战绩标题</p>
+        </div>
+      )}
+
+      {nameModal && (
+        <div className="name-mask">
+          <div className="name-modal" onClick={(e) => e.stopPropagation()}>
+            <span className="name-modal-emoji">✍️</span>
+            <h3>留个名字再看战绩</h3>
+            <p>
+              分享出去就是「<b>{displayName}</b>的战绩」，
+              <br />
+              朋友更容易点开来跟你比
+            </p>
+            <input
+              id="wcq-name"
+              type="text"
+              value={name}
+              onChange={(e) => onName(e.target.value)}
+              placeholder="输入你的名字 / 昵称"
+              maxLength={8}
+              autoComplete="off"
+              autoFocus
+            />
+            <button className="btn-primary btn-big" onClick={() => setNameModal(false)}>
+              {name.trim() ? `就用「${displayName}」，看战绩 →` : '看我的战绩 →'}
+            </button>
+            <button className="name-skip" onClick={() => setNameModal(false)}>
+              跳过，叫我「本帝」就行
+            </button>
+          </div>
         </div>
       )}
 

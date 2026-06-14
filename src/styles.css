@@ -804,41 +804,120 @@ body::before {
   font-size: var(--jr-fs-caption);
   color: var(--jr-neutral-300);
 }
-/* —— 结果页签名输入框 —— */
-.name-box {
+/* —— 结果页：分享署名「改名」入口 —— */
+.name-reopen {
   width: 100%;
   margin-top: var(--jr-space-4);
   display: flex;
-  flex-direction: column;
-  gap: var(--jr-space-2);
-}
-.name-box label {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  font-family: inherit;
   font-size: var(--jr-fs-body-1);
   font-weight: var(--jr-fw-semibold);
   color: var(--jr-neutral-900);
-  text-align: center;
+  background: var(--jr-surface-panel);
+  border: 1px dashed var(--jr-border-warm-strong);
+  border-radius: var(--jr-radius-sm);
+  cursor: pointer;
 }
-.name-box input {
+.name-reopen b {
+  color: var(--jr-green);
+}
+.name-reopen span {
+  font-size: var(--jr-fs-caption);
+  font-weight: var(--jr-fw-bold);
+  color: var(--jr-white);
+  background: var(--jr-black);
+  border-radius: var(--jr-radius-full);
+  padding: 3px 10px;
+}
+
+/* —— 结果页：签名弹窗 —— */
+.name-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 15, 18, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 220;
+  padding: var(--jr-space-4);
+  animation: name-fade var(--jr-dur-fast) ease both;
+}
+@keyframes name-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.name-modal {
   width: 100%;
-  min-height: 50px;
+  max-width: 340px;
+  background: var(--jr-surface-panel);
+  border-radius: var(--jr-radius-lg);
+  box-shadow: var(--jr-shadow-lg);
+  padding: var(--jr-space-5) var(--jr-space-4) var(--jr-space-4);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--jr-space-3);
+  animation: name-pop var(--jr-dur-normal) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes name-pop {
+  from { transform: translateY(16px) scale(0.94); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.name-modal-emoji {
+  font-size: 40px;
+  line-height: 1;
+}
+.name-modal h3 {
+  font-size: var(--jr-fs-h3);
+  font-weight: var(--jr-fw-bold);
+  color: var(--jr-neutral-900);
+  margin: 0;
+}
+.name-modal p {
+  font-size: var(--jr-fs-body-1);
+  color: var(--jr-neutral-600);
+  line-height: 1.5;
+  margin: 0;
+}
+.name-modal p b {
+  color: var(--jr-green);
+}
+.name-modal input {
+  width: 100%;
+  min-height: 52px;
   text-align: center;
   font-family: inherit;
   font-size: var(--jr-fs-h3);
   font-weight: var(--jr-fw-bold);
   color: var(--jr-neutral-900);
-  background: var(--jr-surface-panel);
+  background: var(--jr-surface-canvas);
   border: 2px solid var(--jr-border-warm-strong);
   border-radius: var(--jr-radius-sm);
   outline: none;
   transition: border-color var(--jr-dur-fast);
 }
-.name-box input:focus {
+.name-modal input:focus {
   border-color: var(--jr-green);
   box-shadow: 0 0 0 4px var(--jr-focus-ring);
 }
-.name-box input::placeholder {
+.name-modal input::placeholder {
   color: var(--jr-neutral-300);
   font-weight: var(--jr-fw-medium);
+}
+.name-skip {
+  font-family: inherit;
+  font-size: var(--jr-fs-body-1);
+  font-weight: var(--jr-fw-medium);
+  color: var(--jr-neutral-600);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .copy-toast {

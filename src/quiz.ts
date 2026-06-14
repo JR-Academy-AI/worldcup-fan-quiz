@@ -38,19 +38,36 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// 近音梗：打乱中文名字序（内马尔 → 马内尔）；带 · 的只打乱最后一段
-function scrambleName(zh: string): string | null {
+// 近音字替换表：同音 / 近音的「可信译名用字」。替换 1 个字 → 看起来像另一种官方译名
+// （内马尔 → 内玛尔、姆巴佩 → 穆巴佩），而不是一眼能识破的「顺序打乱」。
+const HOMOPHONE: Record<string, string> = {
+  马: '玛', 玛: '马',
+  西: '希', 希: '西',
+  斯: '思',
+  加: '嘉',
+  莫: '默',
+  内: '纳',
+  罗: '洛',
+  姆: '穆',
+  里: '利',
+  米: '密',
+  佩: '培',
+  迪: '蒂',
+  尼: '妮',
+  卡: '咖',
+};
+
+// 用近音字替换名字里的 1 个字，造一个「像真译名」的陷阱项；带 · 的只动最后一段
+function homophoneVariant(zh: string): string | null {
   const parts = zh.split('·');
-  const last = parts[parts.length - 1];
-  if (last.length < 2) return null;
-  for (let i = 0; i < 12; i++) {
-    const s = shuffle(last.split('')).join('');
-    if (s !== last) {
-      parts[parts.length - 1] = s;
-      return parts.join('·');
-    }
-  }
-  return null;
+  const i = parts.length - 1;
+  const seg = parts[i];
+  const positions = [...seg].map((c, k) => (HOMOPHONE[c] ? k : -1)).filter((k) => k >= 0);
+  if (!positions.length) return null;
+  const pos = positions[Math.floor(Math.random() * positions.length)];
+  parts[i] = seg.slice(0, pos) + HOMOPHONE[seg[pos]] + seg.slice(pos + 1);
+  const variant = parts.join('·');
+  return variant !== zh ? variant : null;
 }
 
 export function buildQuiz(): Question[] {
@@ -58,16 +75,17 @@ export function buildQuiz(): Question[] {
   const picks = [...byDiff(1).slice(0, 5), ...byDiff(2).slice(0, 5), ...byDiff(3).slice(0, 5)];
 
   return shuffle(picks).map((p) => {
-    // 干扰项：1 个近音梗 + 真实球员名补足（同国优先，梗更足）
+    // 干扰项设计（防 50% 瞎猜）：
+    //   ① 1 个近音字陷阱（像另一种译名，casual 球迷最容易中招）
+    //   ② 真实球员名补足，同国优先 —— 同国 4 个名字摆一起，无法靠「国籍/长相不对」排除，只能真认脸
     const pool = shuffle(PLAYERS.filter((x) => x.id !== p.id && x.nameZh !== p.nameZh));
-    const sameCountry = pool.filter((x) => x.country === p.country);
-    const others = pool.filter((x) => x.country !== p.country);
-    const realNames = [...sameCountry.slice(0, 1), ...others].map((x) => x.nameZh);
+    const sameCountry = pool.filter((x) => x.country === p.country).map((x) => x.nameZh);
+    const others = pool.filter((x) => x.country !== p.country).map((x) => x.nameZh);
 
     const opts = new Set<string>([p.nameZh]);
-    const scrambled = scrambleName(p.nameZh);
-    if (scrambled) opts.add(scrambled);
-    for (const name of realNames) {
+    const variant = homophoneVariant(p.nameZh);
+    if (variant && !sameCountry.includes(variant) && !others.includes(variant)) opts.add(variant);
+    for (const name of [...sameCountry, ...others]) {
       if (opts.size >= 4) break;
       opts.add(name);
     }
