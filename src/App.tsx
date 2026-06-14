@@ -256,13 +256,19 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState(() => localStorage.getItem('wcq_name') ?? '');
   const [nameModal, setNameModal] = useState(true); // 进结果页先弹窗签名（可跳过）
+  const composingRef = useRef(false); // 中文 IME 组合中（拼音未上屏）标记
 
   const displayName = name.trim() || '本帝';
-  // 挑衅叫板文案：带名字 → 朋友圈里是「XX的战绩」而非一个匿名测试，逼对方不服来战
-  const shareTitle = `${displayName}的球迷含金量 ${gold}%，打败了全国 ${beaten}% 的人，不服来测！⚽`;
+  // 裂变文案：名字 + 称号专属梗（低分自嘲/高分挑衅，自嘲最有转发欲）+ 百分位 + 叫板
+  const shareTitle = `${displayName}：${tier.shareLine}，打败了全国 ${beaten}% 的球迷，不服来测 ⚽`;
 
-  const onName = (v: string) => {
-    const clean = v.slice(0, 8); // 限 8 字，防刷屏 + 海报排版不崩
+  const onName = (v: string, composing = false) => {
+    // 中文 IME 组合中（拼音还没上屏）：原样反映，不截断、不写库——否则拼音被 slice 截断，永远凑不出汉字
+    if (composing) {
+      setName(v);
+      return;
+    }
+    const clean = v.slice(0, 8); // 限 8 字（按最终字数，不按拼音长度）：防刷屏 + 海报排版不崩
     setName(clean);
     localStorage.setItem('wcq_name', clean);
   };
@@ -289,8 +295,10 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   // 微信里直接转发链接时，分享卡标题 = 当前 document.title → 变成「XX的战绩，不服来测」
   useEffect(() => {
     document.title = shareTitle;
-    // iOS 微信不随 SPA 更新 title 的经典 hack：挂一个瞬时 iframe 强制刷新
-    if (/MicroMessenger/i.test(navigator.userAgent) && /iP(hone|ad|od)/i.test(navigator.userAgent)) {
+    // iOS 微信不随 SPA 更新 title 的经典 hack：挂一个瞬时 iframe 强制刷新。
+    // 🚨 只在签名弹窗关闭后跑——弹窗开着时每打一个字都会插 iframe，抢走输入框焦点、打断中文 IME
+    //（表现为「一直 lost focus + 中文只剩拼音」）。
+    if (!nameModal && /MicroMessenger/i.test(navigator.userAgent) && /iP(hone|ad|od)/i.test(navigator.userAgent)) {
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
       iframe.src = './brand/jr-box.svg';
@@ -300,7 +308,7 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
     return () => {
       document.title = DEFAULT_TITLE;
     };
-  }, [shareTitle]);
+  }, [shareTitle, nameModal]);
 
   // 完成埋点：进结果页上报一次，带含金量 / 答对数 / 称号
   useEffect(() => {
@@ -474,9 +482,15 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
               id="wcq-name"
               type="text"
               value={name}
-              onChange={(e) => onName(e.target.value)}
+              onChange={(e) => onName(e.target.value, composingRef.current)}
+              onCompositionStart={() => {
+                composingRef.current = true;
+              }}
+              onCompositionEnd={(e) => {
+                composingRef.current = false;
+                onName(e.currentTarget.value, false);
+              }}
               placeholder="输入你的名字 / 昵称"
-              maxLength={8}
               autoComplete="off"
               autoFocus
             />

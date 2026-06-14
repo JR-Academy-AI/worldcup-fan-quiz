@@ -902,7 +902,8 @@ body::before {
 }
 .name-modal input:focus {
   border-color: var(--jr-green);
-  box-shadow: 0 0 0 4px var(--jr-focus-ring);
+  /* 柔和绿光圈，去掉刺眼的紫色 focus-ring + 双框 */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--jr-green), transparent 82%);
 }
 .name-modal input::placeholder {
   color: var(--jr-neutral-300);
