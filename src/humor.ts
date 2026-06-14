@@ -52,6 +52,37 @@ export function tierOf(gold: number, allWrong: boolean): Tier {
   };
 }
 
+// —— 分享标题文案池（裂变核心）——
+// 同一个成绩，每次随机选一条，朋友圈里多人分享不重样、保持新鲜感。
+// 名字实时插入；模板挑中一次后固定（输名字时不会跳变）。
+export interface ShareCtx {
+  name: string;
+  gold: number;
+  beaten: number;
+  tier: Tier;
+  allWrong: boolean;
+}
+
+const SHARE_TEMPLATES: Array<(c: ShareCtx) => string> = [
+  ({ name, gold, beaten }) => `${name}：球迷含金量 ${gold}%，打败了全国 ${beaten}% 的人，不服来战 ⚽`,
+  ({ name, tier, beaten }) => `${name}：${tier.shareLine}，打败了全国 ${beaten}% 的球迷 ⚽`,
+  ({ name, gold }) => `谁还不是个老球迷？${name} 含金量 ${gold}%，群里有人敢比吗 ⚽`,
+  ({ name, gold }) => `我测了下，${name} 的球迷含金量 ${gold}%……你敢猜你自己几分？⚽`,
+  ({ name, gold, beaten }) => `全国前 ${Math.max(1, 100 - beaten)}%！${name} 含金量 ${gold}%，不信你超得过 ⚽`,
+  ({ name, gold, beaten }) => `世界杯认脸挑战：${name} 含金量 ${gold}%，打败 ${beaten}% 的人，敢测吗 ⚽`,
+  ({ name, gold }) => `就这？${name} 球迷含金量才 ${gold}%，肯定有人比我高，来打脸 ⚽`,
+  ({ name, gold, beaten }) => `${name} 的球迷含金量是 ${gold}%，打败了全国 ${beaten}% 的球迷，你呢？⚽`,
+  ({ name, tier, gold }) => `${tier.emoji} ${name} 喜提「${tier.name}」称号，含金量 ${gold}%，来抢称号 ⚽`,
+  ({ name, beaten }) => `朋友圈球迷天花板？${name} 打败了全国 ${beaten}% 的人，等你来超 ⚽`,
+];
+
+export const SHARE_TEMPLATE_COUNT = SHARE_TEMPLATES.length;
+
+export function shareTitleOf(c: ShareCtx, idx: number): string {
+  if (c.allWrong) return `史诗级稀有！${c.name} 全程零正确，反向球王认证 🃏 这运气你比得过？⚽`;
+  return SHARE_TEMPLATES[((idx % SHARE_TEMPLATES.length) + SHARE_TEMPLATES.length) % SHARE_TEMPLATES.length](c);
+}
+
 // 毒舌错题点评：认错的越简单，嘲讽越狠；认错冷门题反向安慰
 const WRONG_D1 = [
   (n: string) => `${n}你都不认识？他可能是本届出镜率最高的人。`,

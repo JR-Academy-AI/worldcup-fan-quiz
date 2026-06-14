@@ -37,12 +37,15 @@ export function track(eventName: QuizEvent, payload: Record<string, unknown> = {
     eventName,
     payload: { source: source(), locale: 'zh', ...payload },
   });
-  // sendBeacon 在页面跳转/关闭时也能送达；不支持则退回 fetch keepalive
+  // 🚨 用 text/plain（CORS 安全列表类型）而非 application/json：跨域 application/json 会触发
+  // OPTIONS 预检，而 sendBeacon 发预检请求在微信内置浏览器（iOS WKWebView / 安卓 X5）里极不可靠、
+  // 经常静默丢失 → PV 被系统性少算。text/plain 是「简单请求」不预检，微信里也能稳送。
+  // 后端 /worldcup-quiz/events 路由已配置把 text/plain 当 JSON 解析。
   try {
     if (navigator.sendBeacon) {
-      navigator.sendBeacon(ENDPOINT, new Blob([body], { type: 'application/json' }));
+      navigator.sendBeacon(ENDPOINT, new Blob([body], { type: 'text/plain;charset=UTF-8' }));
     } else {
-      void fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true });
+      void fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body, keepalive: true });
     }
   } catch {
     // 打点失败静默，绝不影响游戏

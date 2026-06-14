@@ -75,7 +75,7 @@ ok(reopen.includes(TEST_NAME), `结果页「改名」入口显示署名（含"${
 
 // 分享标题（document.title）= 带名字的裂变文案
 const title = await page.title();
-ok(title.includes(TEST_NAME) && /打败/.test(title), `分享标题带名字+战绩（title="${title}"）`);
+ok(title.includes(TEST_NAME) && title.includes('⚽'), `分享标题带名字+战绩文案（title="${title}"）`);
 
 // 改名 → 重新弹窗 → 跳过
 await page.click('.name-reopen');

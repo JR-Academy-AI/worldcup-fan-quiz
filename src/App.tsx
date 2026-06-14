@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildQuiz, goldScore, percentBeaten, PLAYERS, type Answered, type Question } from './quiz';
-import { percentileQuip, rightQuip, tierOf, timeoutQuip, wrongQuip } from './humor';
+import { percentileQuip, rightQuip, shareTitleOf, SHARE_TEMPLATE_COUNT, tierOf, timeoutQuip, wrongQuip } from './humor';
 import { makePoster } from './share';
 import { track } from './track';
 
@@ -259,8 +259,10 @@ function Result({ answers, onRetry }: { answers: Answered[]; onRetry: () => void
   const composingRef = useRef(false); // 中文 IME 组合中（拼音未上屏）标记
 
   const displayName = name.trim() || '本帝';
-  // 裂变文案：名字 + 称号专属梗（低分自嘲/高分挑衅，自嘲最有转发欲）+ 百分位 + 叫板
-  const shareTitle = `${displayName}：${tier.shareLine}，打败了全国 ${beaten}% 的球迷，不服来测 ⚽`;
+  const allWrong = wrongCount === answers.length;
+  // 裂变文案：从文案池随机挑一条（进结果页固定，输名字时不跳变），多人分享不重样
+  const [shareIdx] = useState(() => Math.floor(Math.random() * SHARE_TEMPLATE_COUNT));
+  const shareTitle = shareTitleOf({ name: displayName, gold, beaten, tier, allWrong }, shareIdx);
 
   const onName = (v: string, composing = false) => {
     // 中文 IME 组合中（拼音还没上屏）：原样反映，不截断、不写库——否则拼音被 slice 截断，永远凑不出汉字
