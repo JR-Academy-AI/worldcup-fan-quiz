@@ -97,9 +97,11 @@ export function goldScore(answers: Answered[]): number {
   return answers.reduce((sum, a) => sum + (a.correct ? WEIGHT[a.question.player.difficulty] : 0), 0);
 }
 
-// 预埋分布（MVP 无后端）：近似正态 μ=55 σ=22 的 CDF → 打败了多少人
+// 假设含金量服从正态分布 N(μ=45, σ=20)，取其 CDF Φ(z)×100 = 你打败了多少人。
+// 纯娱乐玩法不接真实数据：题库干扰项改难后平均分下移，μ 从 55 下调到 45 更贴合手感
+// （casual 球迷 ~38 分 → 打败约 1/3；资深 ~64 分 → 打败约 8 成；满分 → 99%）。
 export function percentBeaten(gold: number): number {
-  const z = (gold - 55) / 22;
+  const z = (gold - 45) / 20;
   const t = 1 / (1 + 0.2316419 * Math.abs(z));
   const d = 0.3989423 * Math.exp((-z * z) / 2);
   let p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
